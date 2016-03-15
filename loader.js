@@ -1,14 +1,16 @@
 var fs = require("fs");
 
-var data = fs.readFileSync("kst32b.lff", "utf-8");
+var inputFile = "azomix";
+
+var data = fs.readFileSync(inputFile + ".lff", "utf-8");
 var p = require("./lib/parser");
 
 var data = p(data.split("\n"));
 
-fs.writeFileSync( "kst32b.json",JSON.stringify(data), "utf-8");
+//fs.writeFileSync("kst32b.json",JSON.stringify(data), "utf-8");
 console.log(data.length + "char done.");
 
-var buf = new Buffer(1000 * 1000);
+var buf = new Buffer(1000 * 1000 * 100);
 var offset = 0;
 
 var codemax = 0;
@@ -19,10 +21,17 @@ function norm(str){
     return Math.round(256 * f / 10);
 }
 
+function lim(val, limit){
+    if(val > limit){
+        return limit;
+    }
+    return val;
+}
+
 for(var i = 0; i < data.length; i++){
     var font = data[i];
     //文字の書き込み
-    var cp = font[0].codePointAt(0);
+    var cp = font[0].codePointAt(0)
     buf.writeUInt16LE(cp, offset);
     console.log("@"+ font[0]);
     console.log("@@"+ cp);
@@ -48,11 +57,13 @@ for(var i = 0; i < data.length; i++){
             norm(font[1][x][2]),
             norm(font[1][x][3])
         ];
-        buf.writeUInt8(f[0], offset);
-        buf.writeUInt8(f[1], offset + 1);
-        buf.writeUInt8(f[2], offset + 2);
-        buf.writeUInt8(f[3], offset + 3);
-        offset += 4;
+        if(f.length > 4){
+            buf.writeUInt8(lim(f[0], 255), offset);
+            buf.writeUInt8(lim(f[1], 255), offset + 1);
+            buf.writeUInt8(lim(f[2], 255), offset + 2);
+            buf.writeUInt8(lim(f[3], 255), offset + 3);
+        }
+        offset += f.length;
     }
 }
 
@@ -64,5 +75,5 @@ console.log("LENGTH_MAX: " + lengthmax);
 
 console.log(offset / 1000 + "KB");
 
-fs.writeFileSync("kst32b.bin", outbuf);
+fs.writeFileSync(inputFile + ".bin", outbuf);
 
