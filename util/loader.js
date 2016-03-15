@@ -1,14 +1,12 @@
 var fs = require("fs");
 
-var inputFile = "azomix";
+var inputFile = process.argv[2];
 
-var data = fs.readFileSync(inputFile + ".lff", "utf-8");
-var p = require("./lib/parser");
+var data = fs.readFileSync(inputFile, "utf-8");
+var p = require("../lib/lff/parser");
 
 var data = p(data.split("\n"));
-
-//fs.writeFileSync("kst32b.json",JSON.stringify(data), "utf-8");
-console.log(data.length + "char done.");
+console.log(data.length + "char parsed.");
 
 var buf = new Buffer(1000 * 1000 * 100);
 var offset = 0;

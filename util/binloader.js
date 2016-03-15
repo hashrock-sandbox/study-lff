@@ -1,16 +1,9 @@
 var fs = require("fs");
 
-var buf = fs.readFileSync("kst32b.bin");
+var buf = fs.readFileSync(process.argv[2]);
 
 var offset = 0;
 while(offset < buf.length){
-    /*
-    var characterBuf = new Buffer(4);
-    buf.copy(characterBuf, 0, offset, 4);
-    console.log(characterBuf);
-    var characterStr = characterBuf.toString("utf-8");
-    console.log("@"+ characterStr);
-    */
     var chr = String.fromCodePoint(buf.readUInt16LE(offset));
     console.log("@"+ chr);
     offset += 2;
