@@ -35,23 +35,29 @@ function drawChar(x, y, size, fontdata, str) {
 }
 
 function drawString(x, y, size, fontdata, str){
+    var ratio = size / 10;
+    
     var offset = 0;
     for (var i = 0; i < str.length; i++) {
         var ch = str[i];
-        drawChar( x + offset, y, size, fontdata, ch);
+        drawChar( x + offset, y, ratio, fontdata, ch);
         if(str.match(/^(\w| |'|,|&)+$/)){
-            offset += size * 5;
+            offset += ratio * 5;
         }else{
-            offset += size * 10;
+            offset += ratio * 10;
         }
     }
 }
 
 var request = require("superagent");
 
-request.get("./kst32b.json")
+var parser = require("./lib/lff/parser")
+
+request.get("kst32b.lff")
     .end(function (err, data) {
-        drawString(0, 0, 2, data.body, "あいうえお");
-        drawString(0, 20, 2, data.body, "ABCDE123");
-        drawString(0, 40, 2, data.body, "あいうえお");
+        var parsed = parser(data.text.split("\n"));
+        var left = 20;
+        var top = 20;
+        drawString(left, top, 40, parsed, "あいうえお");
+        drawString(left, top + 40, 40, parsed, "ABCDE123");
     })
